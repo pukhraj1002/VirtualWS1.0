@@ -1,1 +1,1 @@
-# VirtualWS1.0
+# Virtual Workshop 1.0
