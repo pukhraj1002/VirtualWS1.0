@@ -1,6 +1,6 @@
 const URL = "https://teachablemachine.withgoogle.com/models/DXbwDydIK/";
 
-let model, webcam, labelContainer, maxPredictions;
+let model, labelContainer, maxPredictions;
 
 // Load the Teachable Machine model
 async function loadModel() {
@@ -17,33 +17,54 @@ async function loadModel() {
     for (let i = 0; i < maxPredictions; i++) {
         labelContainer.appendChild(document.createElement("div"));
     }
-
-    // Setup the webcam
-    const flip = true; // whether to flip the webcam image
-    webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
-    await webcam.setup(); // request access to the webcam
-    await webcam.play();
-    window.requestAnimationFrame(loop);
-
-    // Attach the webcam to the HTML
-    document.getElementById("webcam-container").appendChild(webcam.canvas);
 }
 
-// Prediction loop for webcam
-async function loop() {
-    webcam.update(); // update the webcam frame
-    await predict();
-    window.requestAnimationFrame(loop);
+// Handle image upload and process it
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        console.log("No file selected.");
+        return; // Exit if no file is selected
+    }
+
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+        const img = new Image();
+        img.onload = async function () {
+            const canvas = document.getElementById('uploaded-image-container');
+            const context = canvas.getContext('2d');
+            canvas.width = 320;
+            canvas.height = 240;
+
+            // Draw the uploaded image on the canvas
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            // Call the predict function to get predictions on the uploaded image
+            await predict(canvas);
+        };
+        img.src = e.target.result; // Set the source of the image to the file URL
+    };
+    reader.readAsDataURL(file); // Read the image file as a data URL
 }
 
-// Make predictions
-async function predict() {
-    const prediction = await model.predict(webcam.canvas);
+// Predict function for the uploaded image
+async function predict(canvas) {
+    const prediction = await model.predict(canvas);
+    
+    // Update label container with prediction results
     for (let i = 0; i < maxPredictions; i++) {
         const classPrediction = prediction[i].className + ": " + (prediction[i].probability * 100).toFixed(2) + "%";
         labelContainer.childNodes[i].innerHTML = classPrediction;
     }
 }
 
-// Load the model and start the webcam once the window is loaded
+// Function to stop the webcam
+function stopWebcam() {
+    if (webcam && webcam.webcam) {
+        const stream = webcam.webcam.stream;
+        stream.getTracks().forEach(track => track.stop()); // Stop all webcam tracks
+    }
+}
+
+// Load the model once the page is ready
 window.onload = loadModel;

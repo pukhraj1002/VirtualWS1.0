@@ -16,7 +16,7 @@
     <main>
         <h1>Teachable Machine Image Prediction</h1>
         <!-- Image Upload Button -->
-        <input type="file" id="imageInput" accept="image/*">
+        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
         <a href="./index.html" class="button-link">Use Webcam</a>
         <!-- Canvas to display the uploaded image -->
         <canvas id="uploaded-image-container" style="display:none;"></canvas>
