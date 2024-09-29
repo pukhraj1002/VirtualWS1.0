@@ -45,5 +45,18 @@ async function predict() {
     }
 }
 
+// Function to stop the webcam
+function stopWebcam() {
+    if (webcam && webcam.webcam) {
+        const stream = webcam.webcam.stream;
+        stream.getTracks().forEach(track => track.stop()); // Stop all webcam tracks
+    }
+}
+
+// Event listener for the "Upload Image" link
+document.getElementById('uploadLink').addEventListener('click', function(event) {
+    stopWebcam(); // Stop the webcam when navigating to the upload page
+});
+
 // Load the model and start the webcam once the window is loaded
 window.onload = loadModel;
