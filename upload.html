@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teachable Machine Image Model</title>
+    <title>Teachable Machine Image Prediction</title>
     
     <style>
-        /* General Styling */
+        /* Neon Nature Greenery Theme */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f4f7f6;
+            background: linear-gradient(135deg, #1a5121, #91e37d); /* Greenery background */
             margin: 0;
             padding: 20px;
             display: flex;
@@ -17,70 +17,95 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
+            color: white;
+            overflow: hidden;
         }
 
         h1 {
-            color: #333;
-            font-size: 28px;
+            font-size: 2.2em;
+            color: #00ff6c;
             text-align: center;
             margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 255, 100, 0.7);
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #00ff6c, 0 0 20px #00ff6c, 0 0 30px #00ff6c;
+            }
+            to {
+                text-shadow: 0 0 20px #00ff6c, 0 0 40px #00ff6c, 0 0 60px #00ff6c;
+            }
         }
 
         #imageInput {
-            margin: 20px 0;
-            padding: 10px 20px;
-            background-color: #5cdb95;
+            padding: 12px 25px;
+            background-color: #28a745;
             border: none;
             border-radius: 5px;
-            color: white;
-            font-size: 16px;
+            color: #fff;
+            font-size: 18px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.7); /* Button glow */
         }
 
         #imageInput:hover {
-            background-color: #45a29e;
+            background-color: #00ff6c;
+            box-shadow: 0 0 20px rgba(0, 255, 108, 0.9); /* Stronger glow on hover */
+            transform: scale(1.1);
         }
 
         canvas {
-            border: 2px solid #5cdb95;
+            border: 3px solid #00ff6c; /* Green neon border */
             margin-top: 20px;
-            display: block;
             border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 255, 100, 0.6);
+            display: block;
         }
 
         .button-link {
             display: inline-block;
-            background-color: #5cdb95;
+            background-color: #28a745;
             color: white;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 12px 25px;
+            font-size: 18px;
             text-align: center;
-            text-decoration: none; /* Remove underline */
+            text-decoration: none;
             border-radius: 5px;
-            transition: background-color 0.3s ease;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.7); /* Button glow */
         }
     
         .button-link:hover {
-            background-color: #45a29e;
+            background-color: #00ff6c;
+            box-shadow: 0 0 20px rgba(0, 255, 108, 0.9); /* Stronger glow on hover */
+            transform: scale(1.1);
         }
 
         #label-container {
             margin-top: 20px;
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-            width: 80%;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7); /* Transparent dark container */
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 255, 100, 0.5); /* Neon green glow */
             max-width: 400px;
             text-align: center;
         }
 
         #label-container div {
-            padding: 8px;
             font-size: 18px;
-            color: #333;
+            color: #fff;
+            margin: 10px 0;
+            padding: 12px;
+            background-color: rgba(0, 255, 108, 0.15); /* Light transparent green */
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        #label-container div:hover {
+            background-color: rgba(0, 255, 108, 0.3); /* Darker hover effect */
         }
 
         /* Responsive design */
@@ -102,6 +127,7 @@
     <!-- Image Upload Button -->
     <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
     <a href="./index.html" class="button-link">Use Webcam</a>
+
     <!-- Canvas to display the uploaded image -->
     <canvas id="uploaded-image-container" style="display:none;"></canvas>
 
