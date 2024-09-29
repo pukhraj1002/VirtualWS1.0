@@ -4,168 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teachable Machine Image Model</title>
-    <style>
-        /* Neon and Nature Greenery Theme */
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a5121, #91e37d); /* Greenery background */
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        .container {
-            background: rgba(0, 0, 0, 0.7); /* Transparent dark container */
-            border-radius: 15px;
-            box-shadow: 0 0 15px rgba(0, 255, 100, 0.5); /* Neon green glow */
-            padding: 30px;
-            max-width: 450px;
-            width: 100%;
-            text-align: center;
-            position: relative;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .container:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 255, 100, 0.8); /* Stronger glow on hover */
-        }
-
-        h1 {
-            font-size: 2.2em;
-            color: #00ff6c; /* Neon green text */
-            margin-bottom: 25px;
-            text-shadow: 0 0 5px rgba(0, 255, 100, 0.7);
-            animation: glow 1.5s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 10px #00ff6c, 0 0 20px #00ff6c, 0 0 30px #00ff6c;
-            }
-            to {
-                text-shadow: 0 0 20px #00ff6c, 0 0 40px #00ff6c, 0 0 60px #00ff6c;
-            }
-        }
-
-        button, .button-link {
-            background-color: #28a745; /* Darker green button */
-            color: #fff;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            position: relative;
-            box-shadow: 0 0 10px rgba(40, 167, 69, 0.7); /* Button glow */
-        }
-
-        button:hover, .button-link:hover {
-            background-color: #00ff6c;
-            box-shadow: 0 0 20px rgba(0, 255, 108, 0.9); /* Stronger glow on hover */
-            transform: scale(1.1);
-        }
-
-        .button-link {
-            display: inline-block;
-            text-decoration: none;
-        }
-
-        #webcam-container {
-            margin: 25px 0;
-        }
-
-        #webcam-container canvas {
-            border-radius: 10px;
-            border: 3px solid #00ff6c; /* Green neon border */
-            box-shadow: 0 0 15px rgba(0, 255, 100, 0.6);
-        }
-
-        #label-container {
-            margin-top: 20px;
-        }
-
-        #label-container div {
-            font-size: 1.1em;
-            margin: 8px 0;
-            padding: 12px;
-            background-color: rgba(0, 255, 108, 0.15); /* Light transparent green */
-            border-radius: 8px;
-            color: #fff;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-
-        #label-container div:hover {
-            background-color: rgba(0, 255, 108, 0.3); /* Darker hover effect */
-        }
-
-    </style>
+    <link rel="stylesheet" href="style.css"> <!-- Linking CSS file -->
 </head>
 <body>
 
-<div class="container">
-    <h1>Teachable Machine Image Model</h1>
-    <button type="button" onclick="init()">Start</button>
-    <a href="./upload.html" class="button-link">Upload Images</a>
-    <div id="webcam-container"></div>
-    <div id="label-container"></div>
-</div>
+    <!-- Header Section -->
+    <header>
+        <h2>AI Image Predictor</h2>
+    </header>
 
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <main>
+        <h1>Teachable Machine Image Prediction</h1>
+        
+        <!-- Webcam Container -->
+        <div id="webcam-container"></div> <!-- This is where the webcam will show -->
+        <a href="./upload.html" class="button-link">Upload Image</a>
+        
+        <!-- Container to display prediction results -->
+        <div id="label-container"></div>
+    </main>
 
-<script type="text/javascript">
-    // Model URL
-    const URL = "https://teachablemachine.withgoogle.com/models/DXbwDydIK/";
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 AI Predictor | <a href="https://example.com/contact">Contact Us</a></p>
+    </footer>
 
-    let model, webcam, labelContainer, maxPredictions;
-
-    // Load the image model and setup the webcam
-    async function init() {
-        const modelURL = URL + "model.json";
-        const metadataURL = URL + "metadata.json";
-
-        // load the model and metadata
-        model = await tmImage.load(modelURL, metadataURL);
-        maxPredictions = model.getTotalClasses();
-
-        // Setup the webcam
-        const flip = true; // flip the webcam for better orientation
-        webcam = new tmImage.Webcam(320, 320, flip); // width, height, flip
-        await webcam.setup(); // request access to the webcam
-        await webcam.play();
-        window.requestAnimationFrame(loop);
-
-        // append webcam canvas
-        document.getElementById("webcam-container").appendChild(webcam.canvas);
-        labelContainer = document.getElementById("label-container");
-        for (let i = 0; i < maxPredictions; i++) { // and class labels
-            labelContainer.appendChild(document.createElement("div"));
-        }
-    }
-
-    // Update loop
-    async function loop() {
-        webcam.update(); // update the webcam frame
-        await predict();
-        window.requestAnimationFrame(loop);
-    }
-
-    // Make predictions
-    async function predict() {
-        const prediction = await model.predict(webcam.canvas);
-        for (let i = 0; i < maxPredictions; i++) {
-            const classPrediction = prediction[i].className + ": " + (prediction[i].probability * 100).toFixed(2) + "%";
-            labelContainer.childNodes[i].innerHTML = classPrediction;
-        }
-    }
-</script>
-
+    <!-- External JS Script -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script src="scripts.js"></script> <!-- Linking JS file -->
 </body>
 </html>

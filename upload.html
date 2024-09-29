@@ -4,213 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teachable Machine Image Prediction</title>
-    
-    <style>
-        /* Neon Nature Greenery Theme */
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a5121, #91e37d); /* Greenery background */
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            color: white;
-            overflow: hidden;
-        }
-
-        h1 {
-            font-size: 2.2em;
-            color: #00ff6c;
-            text-align: center;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(0, 255, 100, 0.7);
-            animation: glow 1.5s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 10px #00ff6c, 0 0 20px #00ff6c, 0 0 30px #00ff6c;
-            }
-            to {
-                text-shadow: 0 0 20px #00ff6c, 0 0 40px #00ff6c, 0 0 60px #00ff6c;
-            }
-        }
-
-        #imageInput {
-            padding: 12px 25px;
-            background-color: #28a745;
-            border: none;
-            border-radius: 5px;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            box-shadow: 0 0 10px rgba(40, 167, 69, 0.7); /* Button glow */
-        }
-
-        #imageInput:hover {
-            background-color: #00ff6c;
-            box-shadow: 0 0 20px rgba(0, 255, 108, 0.9); /* Stronger glow on hover */
-            transform: scale(1.1);
-        }
-
-        canvas {
-            border: 3px solid #00ff6c; /* Green neon border */
-            margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 255, 100, 0.6);
-            display: block;
-        }
-
-        .button-link {
-            display: inline-block;
-            background-color: #28a745;
-            color: white;
-            padding: 12px 25px;
-            font-size: 18px;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: all 0.4s ease;
-            box-shadow: 0 0 10px rgba(40, 167, 69, 0.7); /* Button glow */
-        }
-    
-        .button-link:hover {
-            background-color: #00ff6c;
-            box-shadow: 0 0 20px rgba(0, 255, 108, 0.9); /* Stronger glow on hover */
-            transform: scale(1.1);
-        }
-
-        #label-container {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.7); /* Transparent dark container */
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 255, 100, 0.5); /* Neon green glow */
-            max-width: 400px;
-            text-align: center;
-        }
-
-        #label-container div {
-            font-size: 18px;
-            color: #fff;
-            margin: 10px 0;
-            padding: 12px;
-            background-color: rgba(0, 255, 108, 0.15); /* Light transparent green */
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        #label-container div:hover {
-            background-color: rgba(0, 255, 108, 0.3); /* Darker hover effect */
-        }
-
-        /* Responsive design */
-        @media (max-width: 600px) {
-            canvas {
-                width: 100%;
-                height: auto;
-            }
-
-            #label-container {
-                width: 100%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="./style.css"> <!-- Linking CSS file -->
 </head>
 <body>
-    <h1>Teachable Machine Image Prediction</h1>
 
-    <!-- Image Upload Button -->
-    <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
-    <a href="./index.html" class="button-link">Use Webcam</a>
+    <!-- Header Section -->
+    <header>
+        <h2>AI Image Prediction</h2>
+    </header>
 
-    <!-- Canvas to display the uploaded image -->
-    <canvas id="uploaded-image-container" style="display:none;"></canvas>
+    <main>
+        <h1>Teachable Machine Image Prediction</h1>
+        <!-- Image Upload Button -->
+        <input type="file" id="imageInput" accept="image/*">
+        <a href="./index.html" class="button-link">Use Webcam</a>
+        <!-- Canvas to display the uploaded image -->
+        <canvas id="uploaded-image-container" style="display:none;"></canvas>
+        <!-- Container to display prediction results -->
+        <div id="label-container"></div>
+    </main>
 
-    <!-- Container to display prediction results -->
-    <div id="label-container"></div>
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 AI Predictor | <a href="https://example.com/contact">Contact Us</a></p>
+    </footer>
 
+    <!-- External JS Script -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-
-    <script type="text/javascript">
-        const URL = "https://teachablemachine.withgoogle.com/models/DXbwDydIK/";
-
-        let model, labelContainer, maxPredictions;
-
-        // Load the Teachable Machine model on page load
-        async function loadModel() {
-            const modelURL = URL + "model.json";
-            const metadataURL = URL + "metadata.json";
-            
-            // Loading the model
-            model = await tmImage.load(modelURL, metadataURL);
-            maxPredictions = model.getTotalClasses();
-            
-            // Prepare label container to hold prediction results
-            labelContainer = document.getElementById("label-container");
-            labelContainer.innerHTML = ""; // Clear previous labels
-            for (let i = 0; i < maxPredictions; i++) {
-                labelContainer.appendChild(document.createElement("div"));
-            }
-        }
-
-        // Handle image upload and process it
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) {
-                console.log("No file selected.");
-                return; // Exit if no file is selected
-            }
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = new Image();
-                img.onload = async function () {
-                    // Draw the image on the canvas
-                    const canvas = document.getElementById('uploaded-image-container');
-                    const context = canvas.getContext('2d');
-                    canvas.width = 320;
-                    canvas.height = 240;
-
-                    // Resize and crop the image to fit 320x240
-                    const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-                    const x = (canvas.width / 2) - (img.width / 2) * scale;
-                    const y = (canvas.height / 2) - (img.height / 2) * scale;
-                    context.clearRect(0, 0, canvas.width, canvas.height);
-                    context.drawImage(img, x, y, img.width * scale, img.height * scale);
-
-                    canvas.style.display = 'block'; // Ensure the canvas is shown
-
-                    // Call the predict function to get predictions
-                    await predict(canvas);
-
-                    // Clear the file input to allow a new upload
-                    event.target.value = '';
-                };
-                img.src = e.target.result; // Set the source of the image to the file URL
-            };
-            reader.readAsDataURL(file); // Read the image file as a data URL
-        }
-
-        // Predict function for the uploaded image
-        async function predict(source) {
-            const prediction = await model.predict(source);
-            
-            // Update label container with prediction results
-            for (let i = 0; i < maxPredictions; i++) {
-                const classPrediction =
-                    prediction[i].className + ": " + (prediction[i].probability * 100).toFixed(2) + "%";
-                labelContainer.childNodes[i].innerHTML = classPrediction;
-            }
-        }
-
-        // Load the model once the page is ready
-        window.onload = loadModel;
-    </script>
+    <script src="./scripts.js"></script> <!-- Linking JS file -->
 </body>
 </html>
